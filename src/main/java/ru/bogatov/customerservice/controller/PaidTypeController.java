@@ -1,9 +1,10 @@
-package ru.bogatov.customerservice.Controllers;
+package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.bogatov.customerservice.Entities.PaidType;
-import ru.bogatov.customerservice.Services.PaidTypeService;
+import ru.bogatov.customerservice.dto.PaidTypeDto;
+import ru.bogatov.customerservice.entity.PaidType;
+import ru.bogatov.customerservice.service.PaidTypeService;
 
 import java.util.List;
 
@@ -15,8 +16,10 @@ public class PaidTypeController {
 
     public PaidTypeController(@Autowired PaidTypeService paidTypeService){this.paidTypeService = paidTypeService;}
     @GetMapping("")
-    public List<PaidType> getAll(){
-        return paidTypeService.getAll();
+    public PaidTypeDto getAll(){
+        PaidTypeDto paidTypeDto = new PaidTypeDto();
+        paidTypeDto.setPaidTypes(paidTypeService.getAll());
+        return paidTypeDto;
     }
     @GetMapping("/{id}")
     public PaidType getById(@PathVariable String id){

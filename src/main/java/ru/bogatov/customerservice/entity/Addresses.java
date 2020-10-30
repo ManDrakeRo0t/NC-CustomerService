@@ -1,12 +1,9 @@
-package ru.bogatov.customerservice.Entities;
+package ru.bogatov.customerservice.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.UUID;
 
 

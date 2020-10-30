@@ -1,7 +1,7 @@
-package ru.bogatov.customerservice.DAO;
+package ru.bogatov.customerservice.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.bogatov.customerservice.Entities.Addresses;
+import ru.bogatov.customerservice.entity.Addresses;
 
 import java.util.UUID;
 

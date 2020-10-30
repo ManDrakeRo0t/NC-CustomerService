@@ -1,9 +1,10 @@
-package ru.bogatov.customerservice.Controllers;
+package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.bogatov.customerservice.Entities.Customer;
-import ru.bogatov.customerservice.Services.CustomerService;
+import ru.bogatov.customerservice.dto.CustomersListDto;
+import ru.bogatov.customerservice.entity.Customer;
+import ru.bogatov.customerservice.service.CustomerService;
 
 import java.util.List;
 
@@ -17,8 +18,10 @@ public class CustomersController {
     }
 
     @GetMapping()
-    public List<Customer> getAll() {
-        return customerService.getAll();
+    public CustomersListDto getAll() {
+        CustomersListDto customersListDto = new CustomersListDto();
+        customersListDto.setCustomers(customerService.getAll());
+        return customersListDto;
     }
 
     @GetMapping("/{id}")

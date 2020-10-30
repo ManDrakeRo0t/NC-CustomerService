@@ -1,14 +1,12 @@
-package ru.bogatov.customerservice.Services;
+package ru.bogatov.customerservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.bogatov.customerservice.DAO.AddressesRepository;
-import ru.bogatov.customerservice.DAO.CustomerRepository;
-import ru.bogatov.customerservice.DAO.PaidTypeRepository;
-import ru.bogatov.customerservice.Entities.Addresses;
-import ru.bogatov.customerservice.Entities.Customer;
-import ru.bogatov.customerservice.Entities.PaidType;
+import ru.bogatov.customerservice.dao.AddressesRepository;
+import ru.bogatov.customerservice.dao.CustomerRepository;
+import ru.bogatov.customerservice.dao.PaidTypeRepository;
+import ru.bogatov.customerservice.entity.Customer;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,43 +15,42 @@ import java.util.UUID;
 @Transactional
 public class CustomerService {
 
-    CustomerRepository customerRepo;
+    CustomerRepository customerRepository;
     AddressesRepository addressesRepository;
     PaidTypeRepository paidTypeRepository;
 
-    public CustomerService(@Autowired CustomerRepository customerRepo,
+    public CustomerService(@Autowired CustomerRepository customerRepository,
                            @Autowired AddressesRepository addressesRepository,
                            @Autowired PaidTypeRepository paidTypeRepository){
-        this.customerRepo = customerRepo;
+        this.customerRepository = customerRepository;
         this.addressesRepository = addressesRepository;
         this.paidTypeRepository = paidTypeRepository;
     }
 
     public void deleteCustomer(String id){
-        Customer customer = customerRepo.getCustomerById(UUID.fromString(id));
+        Customer customer = customerRepository.getCustomerById(UUID.fromString(id));
         addressesRepository.delete(customer.getAddresses());
-        customerRepo.delete(customer);
+        customerRepository.delete(customer);
     }
 
     public List<Customer> getAll(){
-        return customerRepo.findAll();
+        return customerRepository.findAll();
     }
 
     public Customer getOneById(String id){
-        return customerRepo.getCustomerById(UUID.fromString(id));
+        return customerRepository.getCustomerById(UUID.fromString(id));
     }
 
     public void addCustomer(Customer customer){
-        if(customerRepo.findAll().stream().anyMatch(c -> c.getPhone().equals(customer.getPhone()))) return;
-        if(customer.getAddresses() != null) createAddress(customer);
-        if(customer.getPaidType() != null )createPaidType(customer);
-        customerRepo.save(customer);
+        if(customerRepository.findAll().stream().anyMatch(c -> c.getPhone().equals(customer.getPhone()))) return;
+        if(customer.getAddresses() != null ) createAddress(customer);
+        customerRepository.save(customer);
     }
 
     public void editCustomer(Customer customer,String id){
-        Customer customerFromBD = customerRepo.getCustomerById(UUID.fromString(id));
+        Customer customerFromBD = customerRepository.getCustomerById(UUID.fromString(id));
         updateCustomer(customerFromBD,customer);
-        customerRepo.save(customerFromBD);
+        customerRepository.save(customerFromBD);
     }
 
     public void updateCustomer(Customer oldCustomer,Customer newCustomer){
@@ -62,10 +59,6 @@ public class CustomerService {
             createAddress(newCustomer);
             oldCustomer.setAddresses(newCustomer.getAddresses());
         }
-        if(newCustomer.getPaidType() != null){
-            createPaidType(newCustomer);
-            oldCustomer.setPaidType(newCustomer.getPaidType());
-        }
         oldCustomer.update(newCustomer);
     }
 
@@ -73,7 +66,4 @@ public class CustomerService {
         customer.setAddresses(addressesRepository.save(customer.getAddresses()));
     }
 
-    public void createPaidType(Customer customer){
-        customer.setPaidType(paidTypeRepository.save(customer.getPaidType()));
-    }
 }

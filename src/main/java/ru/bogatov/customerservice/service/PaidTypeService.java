@@ -1,10 +1,10 @@
-package ru.bogatov.customerservice.Services;
+package ru.bogatov.customerservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.bogatov.customerservice.DAO.CustomerRepository;
-import ru.bogatov.customerservice.DAO.PaidTypeRepository;
-import ru.bogatov.customerservice.Entities.PaidType;
+import ru.bogatov.customerservice.dao.CustomerRepository;
+import ru.bogatov.customerservice.dao.PaidTypeRepository;
+import ru.bogatov.customerservice.entity.PaidType;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class PaidTypeService {
     public void deleteById(String id){
         UUID uuid = UUID.fromString(id);
         //todo проверка на наличие в офферах
-        if(customerRepository.findAll().stream().anyMatch( c -> c.getPaidType().getId().equals(uuid))) throw new RuntimeException();
+        if(customerRepository.findAll().stream().anyMatch( c -> c.getPaidType().getId().equals(uuid))) throw new RuntimeException("cant delete this PaidType");
         paidTypeRepository.deletePaidTypeById(UUID.fromString(id));
     }
 
