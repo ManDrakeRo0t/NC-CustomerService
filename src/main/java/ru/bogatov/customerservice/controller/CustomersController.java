@@ -1,8 +1,8 @@
 package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.bogatov.customerservice.dto.CustomersListDto;
 import ru.bogatov.customerservice.entity.Customer;
 import ru.bogatov.customerservice.service.CustomerService;
 
@@ -18,10 +18,8 @@ public class CustomersController {
     }
 
     @GetMapping()
-    public CustomersListDto getAll() {
-        CustomersListDto customersListDto = new CustomersListDto();
-        customersListDto.setCustomers(customerService.getAll());
-        return customersListDto;
+    public List<Customer> getAll() {
+        return customerService.getAll();
     }
 
     @GetMapping("/{id}")
@@ -30,17 +28,31 @@ public class CustomersController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable String id) {
-        customerService.deleteCustomer(id);
+    public ResponseEntity<Object> deleteById(@PathVariable String id) {
+        try {
+            customerService.deleteCustomer(id);
+            return ResponseEntity.ok("was deleted");
+        }catch (RuntimeException e){
+            return ResponseEntity.status(500).build();
+        }
     }
 
     @PostMapping()
-    public void addCustomer(@RequestBody Customer customer) {
-        customerService.addCustomer(customer);
+    public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer) {
+        try {
+            return ResponseEntity.ok().body(customerService.addCustomer(customer));
+        }catch (RuntimeException e){
+            return ResponseEntity.status(500).build();
+        }
+
     }
 
     @PutMapping("/{id}")
-    public void editCustomer(@RequestBody Customer customer, @PathVariable String id) {
-        customerService.editCustomer(customer, id);
+    public ResponseEntity<Customer> editCustomer(@RequestBody Customer customer, @PathVariable String id) {
+        try{
+            return ResponseEntity.ok().body(customerService.editCustomer(customer, id));
+        }catch (RuntimeException e){
+            return ResponseEntity.status(500).build();
+        }
     }
 }

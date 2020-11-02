@@ -9,6 +9,7 @@ import ru.bogatov.customerservice.dao.PaidTypeRepository;
 import ru.bogatov.customerservice.entity.Customer;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,10 +28,15 @@ public class CustomerService {
         this.paidTypeRepository = paidTypeRepository;
     }
 
-    public void deleteCustomer(String id){
-        Customer customer = customerRepository.getCustomerById(UUID.fromString(id));
-        addressesRepository.delete(customer.getAddresses());
-        customerRepository.delete(customer);
+    public void deleteCustomer(String id) throws RuntimeException{
+        try{
+            Customer customer = findCustomerById(id);
+            addressesRepository.delete(customer.getAddresses());
+            customerRepository.delete(customer);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public List<Customer> getAll(){
@@ -41,16 +47,21 @@ public class CustomerService {
         return customerRepository.getCustomerById(UUID.fromString(id));
     }
 
-    public void addCustomer(Customer customer){
-        if(customerRepository.findAll().stream().anyMatch(c -> c.getPhone().equals(customer.getPhone()))) return;
+    public Customer addCustomer(Customer customer) throws RuntimeException{
+        if(customerRepository.findAll().stream().anyMatch(c -> c.getPhone().equals(customer.getPhone()))) throw new RuntimeException("this phone already used");
         if(customer.getAddresses() != null ) createAddress(customer);
-        customerRepository.save(customer);
+        return customerRepository.save(customer);
     }
 
-    public void editCustomer(Customer customer,String id){
-        Customer customerFromBD = customerRepository.getCustomerById(UUID.fromString(id));
-        updateCustomer(customerFromBD,customer);
-        customerRepository.save(customerFromBD);
+    public Customer editCustomer(Customer customer,String id) throws RuntimeException{
+        try{
+            Customer customerFromBD = findCustomerById(id);
+            updateCustomer(customerFromBD,customer);
+            return customerRepository.save(customerFromBD);
+        }catch (RuntimeException e){
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public void updateCustomer(Customer oldCustomer,Customer newCustomer){
@@ -64,6 +75,15 @@ public class CustomerService {
 
     public void createAddress(Customer customer){
         customer.setAddresses(addressesRepository.save(customer.getAddresses()));
+    }
+
+    public Customer findCustomerById(String id) throws RuntimeException{
+        Optional<Customer> optionalCustomer = customerRepository.findCustomerById(UUID.fromString(id));
+        if(!optionalCustomer.isPresent()){
+            throw new RuntimeException("cant find customer with id : " + id);
+        }else{
+            return optionalCustomer.get();
+        }
     }
 
 }

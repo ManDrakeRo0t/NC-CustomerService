@@ -7,6 +7,7 @@ import ru.bogatov.customerservice.dao.PaidTypeRepository;
 import ru.bogatov.customerservice.entity.PaidType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,20 +29,25 @@ public class PaidTypeService {
         return paidTypeRepository.getPaidTypeById(UUID.fromString(id)); //todo проверка
     }
 
-    public void deleteById(String id){
+    public void deleteById(String id) throws RuntimeException{
         UUID uuid = UUID.fromString(id);
         //todo проверка на наличие в офферах
         if(customerRepository.findAll().stream().anyMatch( c -> c.getPaidType().getId().equals(uuid))) throw new RuntimeException("cant delete this PaidType");
         paidTypeRepository.deletePaidTypeById(UUID.fromString(id));
     }
 
-    public void editPaidType(PaidType paidType,String id){
-        PaidType paidTypeFromDB = paidTypeRepository.getPaidTypeById(UUID.fromString(id));
-        paidTypeFromDB.setName(paidType.getName());
-        paidTypeRepository.save(paidTypeFromDB);
+    public PaidType editPaidType(PaidType paidType,String id) throws RuntimeException{
+        Optional<PaidType> OptionalTypeFromDB = paidTypeRepository.findPaidTypeById(UUID.fromString(id));
+        if(!OptionalTypeFromDB.isPresent()){
+            throw new RuntimeException("cant find paidType with id : " + id);
+        }else{
+            PaidType paidTypeFromDB = OptionalTypeFromDB.get();
+            paidTypeFromDB.setName(paidType.getName());
+            return paidTypeRepository.save(paidTypeFromDB);
+        }
     }
 
-    public void createPaidType(PaidType paidType){
-        paidTypeRepository.save(paidType);
+    public PaidType createPaidType(PaidType paidType){
+        return paidTypeRepository.save(paidType);
     }
 }

@@ -1,8 +1,8 @@
 package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.bogatov.customerservice.dto.PaidTypeDto;
 import ru.bogatov.customerservice.entity.PaidType;
 import ru.bogatov.customerservice.service.PaidTypeService;
 
@@ -16,25 +16,33 @@ public class PaidTypeController {
 
     public PaidTypeController(@Autowired PaidTypeService paidTypeService){this.paidTypeService = paidTypeService;}
     @GetMapping("")
-    public PaidTypeDto getAll(){
-        PaidTypeDto paidTypeDto = new PaidTypeDto();
-        paidTypeDto.setPaidTypes(paidTypeService.getAll());
-        return paidTypeDto;
+    public List<PaidType> getAll(){
+        return paidTypeService.getAll();
     }
     @GetMapping("/{id}")
     public PaidType getById(@PathVariable String id){
         return paidTypeService.getOneById(id);
     }
     @PostMapping()
-    public void createPaidType(@RequestBody PaidType paidType){
-        paidTypeService.createPaidType(paidType);
+    public ResponseEntity<PaidType> createPaidType(@RequestBody PaidType paidType){
+        return ResponseEntity.ok().body(paidTypeService.createPaidType(paidType));
     }
     @PutMapping("/{id}")
-    public void updatePaidType(@RequestBody PaidType paidType,@PathVariable String id){
-        paidTypeService.editPaidType(paidType,id);
+    public ResponseEntity<PaidType> updatePaidType(@RequestBody PaidType paidType,@PathVariable String id){
+        try{
+            return ResponseEntity.ok().body(paidTypeService.editPaidType(paidType,id));
+        }catch (RuntimeException e){
+            return ResponseEntity.status(500).build();
+        }
+
     }
     @DeleteMapping("/{id}")
-    public void deletePaidType(@PathVariable String id){
-        paidTypeService.deleteById(id);
+    public ResponseEntity<Object> deletePaidType(@PathVariable String id){
+        try{
+            paidTypeService.deleteById(id);
+            return ResponseEntity.ok("was deleted");
+        }catch(RuntimeException e){
+            return ResponseEntity.status(500).build();
+        }
     }
 }
