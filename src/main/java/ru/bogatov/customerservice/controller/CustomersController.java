@@ -1,6 +1,7 @@
 package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bogatov.customerservice.entity.Customer;
@@ -33,7 +34,7 @@ public class CustomersController {
             customerService.deleteCustomer(id);
             return ResponseEntity.ok("was deleted");
         }catch (RuntimeException e){
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -42,7 +43,7 @@ public class CustomersController {
         try {
             return ResponseEntity.ok().body(customerService.addCustomer(customer));
         }catch (RuntimeException e){
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }
@@ -52,7 +53,7 @@ public class CustomersController {
         try{
             return ResponseEntity.ok().body(customerService.editCustomer(customer, id));
         }catch (RuntimeException e){
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

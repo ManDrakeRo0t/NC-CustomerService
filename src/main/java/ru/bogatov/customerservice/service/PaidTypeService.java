@@ -31,7 +31,6 @@ public class PaidTypeService {
 
     public void deleteById(String id) throws RuntimeException{
         UUID uuid = UUID.fromString(id);
-        //todo проверка на наличие в офферах
         if(customerRepository.findAll().stream().anyMatch( c -> c.getPaidType().getId().equals(uuid))) throw new RuntimeException("cant delete this PaidType");
         paidTypeRepository.deletePaidTypeById(UUID.fromString(id));
     }

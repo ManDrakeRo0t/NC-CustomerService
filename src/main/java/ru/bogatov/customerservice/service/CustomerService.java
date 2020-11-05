@@ -1,13 +1,16 @@
 package ru.bogatov.customerservice.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.bogatov.customerservice.dao.AddressesRepository;
 import ru.bogatov.customerservice.dao.CustomerRepository;
 import ru.bogatov.customerservice.dao.PaidTypeRepository;
 import ru.bogatov.customerservice.entity.Customer;
+import ru.bogatov.customerservice.entity.Role;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,13 +22,16 @@ public class CustomerService {
     CustomerRepository customerRepository;
     AddressesRepository addressesRepository;
     PaidTypeRepository paidTypeRepository;
+    PasswordEncoder passwordEncoder;
 
     public CustomerService(@Autowired CustomerRepository customerRepository,
                            @Autowired AddressesRepository addressesRepository,
-                           @Autowired PaidTypeRepository paidTypeRepository){
+                           @Autowired PaidTypeRepository paidTypeRepository,
+                           @Autowired PasswordEncoder passwordEncoder){
         this.customerRepository = customerRepository;
         this.addressesRepository = addressesRepository;
         this.paidTypeRepository = paidTypeRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void deleteCustomer(String id) throws RuntimeException{
@@ -39,6 +45,18 @@ public class CustomerService {
         }
     }
 
+    public Customer findByEmail(String email){
+        return customerRepository.findCustomerByEmail(email);
+    }
+
+    public Customer findByEmailAndPassword(String email,String password){
+        Customer customer = findByEmail(email);
+        if(customer != null){
+            if(passwordEncoder.matches(password,customer.getPassword())) return customer;
+        }
+        return null;
+    }
+
     public List<Customer> getAll(){
         return customerRepository.findAll();
     }
@@ -48,8 +66,12 @@ public class CustomerService {
     }
 
     public Customer addCustomer(Customer customer) throws RuntimeException{
-        if(customerRepository.findAll().stream().anyMatch(c -> c.getPhone().equals(customer.getPhone()))) throw new RuntimeException("this phone already used");
+        customerRepository.findAll().forEach(c -> {
+            if(c.getPhone().equals(customer.getPhone()) || c.getEmail().equals(customer.getEmail())) throw new RuntimeException("this phone or mail already used");
+        });
         if(customer.getAddresses() != null ) createAddress(customer);
+        customer.setRoles(Collections.singleton(Role.USER));
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         return customerRepository.save(customer);
     }
 

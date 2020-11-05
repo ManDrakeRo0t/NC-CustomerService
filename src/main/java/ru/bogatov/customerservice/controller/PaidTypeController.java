@@ -1,6 +1,7 @@
 package ru.bogatov.customerservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bogatov.customerservice.entity.PaidType;
@@ -32,7 +33,7 @@ public class PaidTypeController {
         try{
             return ResponseEntity.ok().body(paidTypeService.editPaidType(paidType,id));
         }catch (RuntimeException e){
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }
@@ -42,7 +43,7 @@ public class PaidTypeController {
             paidTypeService.deleteById(id);
             return ResponseEntity.ok("was deleted");
         }catch(RuntimeException e){
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
