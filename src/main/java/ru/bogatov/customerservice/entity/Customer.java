@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,9 +29,13 @@ public class Customer {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="address_id")
     private Addresses addresses;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "paidtype_id")
-    private PaidType paidType;
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "customers_paidtypes",
+            joinColumns = { @JoinColumn(name = "customer_id") },
+            inverseJoinColumns = { @JoinColumn(name = "paidtype_id") }
+    )
+    private List<PaidType> paidTypes; //todo list paid type
 
     @ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role" , joinColumns = @JoinColumn(name = "user_id"))

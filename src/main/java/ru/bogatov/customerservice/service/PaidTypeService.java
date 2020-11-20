@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.bogatov.customerservice.dao.CustomerRepository;
 import ru.bogatov.customerservice.dao.PaidTypeRepository;
+import ru.bogatov.customerservice.entity.Customer;
 import ru.bogatov.customerservice.entity.PaidType;
 
 import java.util.List;
@@ -31,7 +32,10 @@ public class PaidTypeService {
 
     public void deleteById(String id) throws RuntimeException{
         UUID uuid = UUID.fromString(id);
-        if(customerRepository.findAll().stream().anyMatch( c -> c.getPaidType().getId().equals(uuid))) throw new RuntimeException("cant delete this PaidType");
+        for(Customer c : customerRepository.findAll() ){
+            List<PaidType> customersPaidTypes = c.getPaidTypes();
+            if(customersPaidTypes.stream().anyMatch( p -> p.getId().equals(uuid))) throw new RuntimeException("cant delete this PaidType");
+        }
         paidTypeRepository.deletePaidTypeById(UUID.fromString(id));
     }
 

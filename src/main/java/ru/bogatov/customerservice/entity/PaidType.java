@@ -17,8 +17,9 @@ public class PaidType {
     private UUID id;
     @Column(nullable = false)
     private String name;
-    @OneToMany( fetch = FetchType.EAGER)
-    private List<Customer> customersList;
+    @Transient
+    @ManyToMany(mappedBy = "paidTypes")
+    List<Customer> customerList;
 
     public PaidType(){}
 }

@@ -1,16 +1,22 @@
 package ru.bogatov.customerservice.controller;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.bogatov.customerservice.entity.Customer;
+import ru.bogatov.customerservice.entity.PaidType;
 import ru.bogatov.customerservice.service.CustomerService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("customers")
+@PreAuthorize("hasAnyAuthority('USER')")
 public class CustomersController {
     private CustomerService customerService;
 
@@ -19,7 +25,7 @@ public class CustomersController {
     }
 
     @GetMapping()
-    public List<Customer> getAll() {
+    public List<Customer> getAll(HttpServletRequest request){
         return customerService.getAll();
     }
 
@@ -45,7 +51,11 @@ public class CustomersController {
         }catch (RuntimeException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
 
+    @GetMapping("/{id}/paid-types")
+    public List<PaidType> getCustomersPaidTypes(@PathVariable String id){
+        return customerService.getCustomersPaidTypes(id);
     }
 
     @PutMapping("/{id}")

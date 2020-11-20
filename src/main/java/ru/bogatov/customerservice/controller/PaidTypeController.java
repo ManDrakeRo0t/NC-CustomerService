@@ -37,6 +37,8 @@ public class PaidTypeController {
         }
 
     }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletePaidType(@PathVariable String id){
         try{

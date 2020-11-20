@@ -8,6 +8,7 @@ import ru.bogatov.customerservice.dao.AddressesRepository;
 import ru.bogatov.customerservice.dao.CustomerRepository;
 import ru.bogatov.customerservice.dao.PaidTypeRepository;
 import ru.bogatov.customerservice.entity.Customer;
+import ru.bogatov.customerservice.entity.PaidType;
 import ru.bogatov.customerservice.entity.Role;
 
 import java.util.Collections;
@@ -43,6 +44,15 @@ public class CustomerService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    public List<PaidType> getCustomersPaidTypes(String id){
+            Customer customer = findCustomerById(id);
+            return customer.getPaidTypes();
+    }
+
+    public UUID getIdFormEmail(String email){
+        return findByEmail(email).getId();
     }
 
     public Customer findByEmail(String email){
